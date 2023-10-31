@@ -133,7 +133,7 @@ export default defineComponent({
 
 		// If there still isn't a date, exit the workflow 
 		if(steps?.trigger?.event?.properties[this.eventDate]?.date?.start == null && steps?.trigger?.event?.properties[this.eventDate]?.date?.start == undefined){
-      	console.log('Sem data de início');
+      	console.log('No start date');
 				$.flow.exit()
 			return;
     }
@@ -149,26 +149,21 @@ export default defineComponent({
 			const pageID = steps.trigger.event.id
 			const response = await notion.pages.retrieve({ page_id: pageID})
 
-			triggerProps = response.properties
-
-			//check if null
-			if(triggerProps[this.eventDate].date.start !== null && triggerProps[this.eventDate].date.start !== undefined){
-      	return;
-    	}			
+			triggerProps = response.properties		
 		} else {
 			triggerProps = steps.trigger.event.properties
 		}
 
-		//if endDate is null, define it as two hours forward
 		if(triggerProps[this.eventDate].date.end == null){
 			startDate = new Date(triggerProps[this.eventDate].date.start);
 			newEndDate = new Date;
 
-			//if All-day event, turns end date equal to start date
+			//if is an All-day event, end date receive start date value
 			if(triggerProps[this.eventDate].date.start.length == 10){
 				triggerProps[this.eventDate].date.end = triggerProps[this.eventDate].date.start;
 			}
-			else{
+			//Define end date as two hours forward
+			else {
 				newEndDate.setTime(startDate.getTime() + 2 * 60 * 60 * 1000);
 				triggerProps[this.eventDate].date.end = newEndDate;
 			}
